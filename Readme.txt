@@ -1,6 +1,6 @@
 *************************
 ** AYSALIA: DUAL PACK  **
-** 08. Juni 2007       **
+** 30. November 2018   **
 *************************
 
 Vielen Dank, dass Sie Aysalia spielen! Das "Dual Pack" beeinhaltet die
@@ -12,6 +12,9 @@ von Mystix Development. Dem "Dual Pack" liegen zusätzlich die beiden sehr alten
 Versionen von Dragon Quest bei, die nun in "Aysalia DOS" umbenannt wurden.
 Die Versionen enthalten keinen Quelltext und liegen nur aus "nostalgischen"
 Gründen bei.
+
+Aysalia DOS I und Aysalia DOS II können mit allen Windows Versionen (auch 64 Bit)
+gespielt werden. Hierfür wurde DOS Box in das Package inkludiert.
 
 Wir wünschen Ihnen viel Spaß beim Spielen. Wenn Sie Verbesserungsvorschläge
 haben, können Sie diese uns gerne zukommen lassen!
