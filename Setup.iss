@@ -38,6 +38,7 @@ Name: "iss"; Description: "InnoSetup Installations-Quelltext"; Types: alles
 
 [Dirs]
 Name: "{app}\Nostalgie"; Components: aydos; Permissions: users-modify
+Name: "{app}\Quelltexte"; Components: iss zdd_src sua_src aydos_src; Permissions: users-modify
 Name: "{app}\Quelltexte\InnoSetup"; Components: iss; Permissions: users-modify
 Name: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src; Permissions: users-modify
 Name: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src; Permissions: users-modify
@@ -78,6 +79,7 @@ Source: "Nostalgie\*.dof"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysa
 Source: "Nostalgie\*.dpr"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
 Source: "Nostalgie\*.res"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
 Source: "Nostalgie\*.ico"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
+Source: "Nostalgie\*.bas"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
 ; Setup Source
 Source: "Setup.iss"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 Source: "Wizard Image.bmp"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
