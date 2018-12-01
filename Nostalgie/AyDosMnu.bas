@@ -43,10 +43,20 @@ MainMenu:
 AyDos1:
         CLS
         SHELL "AyDos1.exe"
+        PRINT
+        PRINT "Spiel zu Ende!"
+        PRINT
+        SLEEP 5
+        CLS
         RETURN
 
 AyDos2:
         CLS
         SHELL "AyDos2.exe"
+        PRINT
+        PRINT "Spiel zu Ende!"
+        PRINT
+        SLEEP 5
+        CLS
         RETURN
 
