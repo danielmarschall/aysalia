@@ -1,9 +1,9 @@
-; InnoSetup 5.5.9
+; InnoSetup 5.6.1
 ; Achtung: Bei Veränderung dieser ISS-Datei erst abspeichern und dann Setup erstellen (da das Setup-Script mitgepackt wird)
 
 [Setup]
 AppName=Aysalia Dual-Pack
-AppVerName=Aysalia Dual-Pack 1.0.4
+AppVerName=Aysalia Dual-Pack 1.0.5
 AppCopyright=(C) 1999-2007 Kai Breiling, 2007-2018 ViaThinkSoft
 AppPublisher=Mystix Development
 AppPublisherURL=http://dev.mystix-entertainment.de/
@@ -17,6 +17,7 @@ Compression=lzma
 SolidCompression=yes
 WizardImageFile=Wizard Image.bmp
 WizardSmallImageFile=Wizard Small Image.bmp
+;MinVersion=4.0
 
 [Languages]
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
@@ -27,7 +28,6 @@ Name: "alles"; Description: "Spiele und Quelltexte"
 Name: "user"; Description: "Benutzerdefiniert"; Flags: iscustom
 
 [Components]
-Name: "vbrt"; Description: "Microsoft Visual Basic 6.0 Runtime Library (Service Pack 6)"; Types: user core alles; Flags: fixed
 Name: "zdd"; Description: "Zeitalter der Dämonen 1.5.3"; Types: core alles
 Name: "zdd_src"; Description: "Zeitalter der Dämonen 1.5.3 (Visual Basic Quelltext)"; Types: alles
 Name: "sua"; Description: "Schatten über Aysalia 2.3.1"; Types: core alles
@@ -47,42 +47,30 @@ Name: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src; Permissions: users-
 ; Zeitalter der Dämonen
 Source: "Zeitalter der Dämonen\*.exe"; Flags: ignoreversion; DestDir: "{app}\"; Components: zdd
 ; Zeitalter der Dämonen Quelltexte
-Source: "Zeitalter der Dämonen\*.vbp"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.bas"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.frm"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.frx"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.jpg"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.bmp"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
-Source: "Zeitalter der Dämonen\*.bat"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
+Source: "Zeitalter der Dämonen\*"; Flags: ignoreversion recursesubdirs; DestDir: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src
 ; Schatten über Aysalia
 Source: "Schatten über Aysalia\*.exe"; Flags: ignoreversion; DestDir: "{app}\"; Components: sua
 ; Schatten über Aysalia Quelltexte
-Source: "Schatten über Aysalia\Nicht verwendet\*.vbp"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia\Nicht verwendet"; Components: sua_src
-Source: "Schatten über Aysalia\Nicht verwendet\*.bas"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia\Nicht verwendet"; Components: sua_src
-Source: "Schatten über Aysalia\Nicht verwendet\*.frm"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia\Nicht verwendet"; Components: sua_src
-Source: "Schatten über Aysalia\Nicht verwendet\*.frx"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia\Nicht verwendet"; Components: sua_src
-Source: "Schatten über Aysalia\*.vbp"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
-Source: "Schatten über Aysalia\*.bas"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
-Source: "Schatten über Aysalia\*.frm"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
-Source: "Schatten über Aysalia\*.frx"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
-Source: "Schatten über Aysalia\*.jpg"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
-Source: "Schatten über Aysalia\*.bat"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
+Source: "Schatten über Aysalia\*"; Flags: ignoreversion recursesubdirs; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
 ; Aysalia DOS
-Source: "Nostalgie\*.*"; Flags: ignoreversion; DestDir: "{app}"; Components: aydos
+Source: "Aysalia DOS\*.*"; Flags: ignoreversion; DestDir: "{app}"; Components: aydos
 ; Aysalia DOS Quelltext
-Source: "Nostalgie\Source\*"; Flags: ignoreversion recursesubdirs; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
+Source: "Aysalia DOS\Source\*"; Flags: ignoreversion recursesubdirs; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
 ; Setup Source
 Source: "Setup.iss"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 Source: "Wizard Image.bmp"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 Source: "Wizard Small Image.bmp"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
+Source: "Visual C++ 6.0 - Runtime Library.exe"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 ; Allgemein
 Source: "Readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
 ; Temporäre Runtime (Runtime wird bei Setup-Source behalten)
-Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: vbrt
+Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: sua zdd
+Source: "Visual C++ 6.0 - Runtime Library.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: aydos
 
 [Run]
-Filename: "{tmp}\Visual Basic 6.0 - Runtime Library SP6.exe"; StatusMsg: "Installiere Microsoft Visual Basic 6.0 Runtime Library..."; Flags: waituntilterminated; Components: vbrt
+Filename: "{tmp}\Visual Basic 6.0 - Runtime Library SP6.exe"; StatusMsg: "Installiere Microsoft Visual Basic 6.0 Runtime Library..."; Flags: waituntilterminated; Components: sua zdd
+Filename: "{tmp}\Visual C++ 6.0 - Runtime Library.exe"; StatusMsg: "Installiere Microsoft Visual C++ 6.0 Runtime Library..."; Flags: waituntilterminated; Components: aydos
 
 [Icons]
 Name: "{group}\Aysalia DOS"; Filename: "{app}\AyDos.exe"; WorkingDir: "{app}"; Components: aydos

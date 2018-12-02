@@ -1,0 +1,10 @@
+
+tasm AYDOSMNU.ASM
+
+tlink AYDOSMNU.OBJ
+
+ren AYDOSMNU.EXE AyDos.mnu
+
+del AYDOSMNU.MAP
+
+del AYDOSMNU.OBJ

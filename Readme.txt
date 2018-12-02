@@ -1,6 +1,6 @@
 *************************
 ** AYSALIA: DUAL PACK  **
-** 30. November 2018   **
+** 02. December 2018   **
 *************************
 
 Vielen Dank, dass Sie Aysalia spielen! Das "Dual Pack" beeinhaltet die
@@ -14,7 +14,7 @@ Die Versionen enthalten keinen Quelltext und liegen nur aus "nostalgischen"
 Gründen bei.
 
 Aysalia DOS I und Aysalia DOS II können mit allen Windows Versionen (auch 64 Bit)
-gespielt werden. Hierfür wurde DOS Box in das Package inkludiert.
+gespielt werden. Hierfür wurde DOSBox in das Package inkludiert.
 
 Wir wünschen Ihnen viel Spaß beim Spielen. Wenn Sie Verbesserungsvorschläge
 haben, können Sie diese uns gerne zukommen lassen!
@@ -263,16 +263,16 @@ Sie benötigen für die Quelltexte Visual Basic 5 oder höher.
 Beachten Sie jedoch, dass dem Installationspaket nur die Runtime für
 Visual Basic 6 beigelegt wurde. Wenn Sie die Anwendungen mit Visual
 Basic 5 erstellen, dann benötigt der Entbenutzer die Runtime für
-Version 5 und nicht die der Version 6, die dem Setupquelltext beiliegt ist
+Version 5 und nicht die der Version 6, die dem Setupquelltext beiliegt, ist
 und mitinstalliert wird.
 Sie können die Runtime für Version 5 bei Microsoft herunterladen:
-http://www.microsoft.com/downloads/details.aspx?FamilyID=05ae09e6-082a-4cd1-99cd-8911b6034c20
+https://support.microsoft.com/de-de/help/180071/file-msvbvm50-exe-installs-visual-basic-5-0-run-time-files
 
 Das Installationsprogramm ist mit InnoSetup entwickelt worden.
 Kostenlos erhältlich unter: http://www.jrsoftware.org/
 
 Um die Ressourcen (Bilder, Grafiken) aus den FRX-Dateien zu bekommen, benötigen Sie
-ein Tool wie z.B. "FRX Split": http://www.freedownloadscenter.com/Programming/Visual_Basic_Tools/FRX_Split.html
+ein Tool wie z.B. "FRX Split": http://www.topshareware.com/FRX-Split-download-9464.htm
 
 ==========================
 == KONTAKTINFORMATIONEN ==
@@ -280,10 +280,10 @@ ein Tool wie z.B. "FRX Split": http://www.freedownloadscenter.com/Programming/Vi
 
 KONTAKT
 
-Entwicklung
+Entwicklung von "Aysalia"
 Kai Breiling (kai_breiling@gmx.de)
 
-Weiterentwicklung / Optimierung
+Weiterentwicklung und Erstellung des "Dual Packs"
 Daniel Marschall (info@daniel-marschall.de)
 
 Offizielle Webseite
