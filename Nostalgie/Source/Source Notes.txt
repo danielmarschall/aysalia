@@ -1,0 +1,67 @@
+
+Annotations for the Aysalia DOS I & II source codes
+===================================================
+
+CALLING FLOW
+------------
+
+When running under Windows:
+
+	AyDos.exe (32 Bit PE) --> DOSBox (32 Bit PE) --> AyDos.exe (16 Bit COM) --> AyDos.mnu (16 Bit MZ) --> AyDos1/2.gam (16 Bit MZ)
+
+	1. AyDos.exe (32 Bit PE) calls DOSBox.exe (32 Bit PE) with config DOSBox.conf
+	2. DOSBox.conf starts AyDos.exe (16 Bit MZ) as autostart
+	3. AyDos.exe (16 Bit COM) calls AyDos.mnu (16 Bit MZ)
+	4. AyDos.mnu (16 Bit MZ) shows a menu and calls AyDos1.gam or AyDos2.gam (both 16 Bit MZ)
+	
+When running under DOS:
+
+	AyDos.exe (16 Bit COM) --> AyDos.mnu (16 Bit MZ) --> AyDos1/2.gam (16 Bit MZ)
+
+	1. AyDos.exe (16 Bit COM) calls AyDos.mnu (16 Bit MZ)
+	2. AyDos.mnu (16 Bit MZ) shows a menu and calls AyDos1.gam or AyDos2.gam (both 16 Bit MZ)
+
+
+AYDOS.EXE
+---------
+
+AyDos.exe is a "fat binary" which can be called by DOS and Windows.
+
+In Windows mode, it calls DOSBox.exe with the arguments "-noconsole -conf DOSBox.conf" and
+the working directory being the directory where the EXE file is located.
+
+In DOS mode, it executes the application "AYDOS.MNU" (which is actually a COM-file
+containing the menu code that will eventually call AYDOS1.GAM or AYDOS2.GAM which are
+actually MZ-executables).
+
+To create this fat binary, do the following:
+
+1. Compile AyDos.exe with Delphi
+
+2. Compile DosStub.com with TASM
+
+3. With an hex editor, copy the contents of DosStub.com into AyDos.exe to offset 0x40
+
+
+AYDOS1.GAM and AYDOS2.GAM
+-------------------------
+
+These games were developed and compiled in QuickBasic, but unfortunately the source code is lost.
+
+The EXE files have been modified with a hex editor to fix some small issues.
+A side effect of one fix is that the video mode is not reset when the game exists.
+Therefore, the EXE files have been renamed to GAM and will be called by the menu/launcher executable,
+which resets the video mode correctly, in addition in showing a menu.
+
+
+DISTRIBUTE
+----------
+
+AyDos.exe
+AyDos.mnu
+AyDos1.gam
+AyDos2.gam
+DOSBox.exe
+DOSBox.conf
+SDL.dll (required by DOSBox)
+SDL_net.dll (required by DOSBox)

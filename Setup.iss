@@ -37,7 +37,6 @@ Name: "aydos_src"; Description: "Aysalia DOS (Launcher Quelltext)"; Types: alles
 Name: "iss"; Description: "InnoSetup Installations-Quelltext"; Types: alles
 
 [Dirs]
-Name: "{app}\Nostalgie"; Components: aydos; Permissions: users-modify
 Name: "{app}\Quelltexte"; Components: iss zdd_src sua_src aydos_src; Permissions: users-modify
 Name: "{app}\Quelltexte\InnoSetup"; Components: iss; Permissions: users-modify
 Name: "{app}\Quelltexte\Zeitalter der Dämonen"; Components: zdd_src; Permissions: users-modify
@@ -69,17 +68,9 @@ Source: "Schatten über Aysalia\*.frx"; Flags: ignoreversion; DestDir: "{app}\Que
 Source: "Schatten über Aysalia\*.jpg"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
 Source: "Schatten über Aysalia\*.bat"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Schatten über Aysalia"; Components: sua_src
 ; Aysalia DOS
-Source: "Nostalgie\*.exe"; Flags: ignoreversion; DestDir: "{app}\Nostalgie"; Components: aydos
-Source: "Nostalgie\*.dll"; Flags: ignoreversion; DestDir: "{app}\Nostalgie"; Components: aydos
-Source: "Nostalgie\*.txt"; Flags: ignoreversion; DestDir: "{app}\Nostalgie"; Components: aydos
-Source: "Nostalgie\*.conf"; Flags: ignoreversion; DestDir: "{app}\Nostalgie"; Components: aydos
+Source: "Nostalgie\*.*"; Flags: ignoreversion; DestDir: "{app}"; Components: aydos
 ; Aysalia DOS Quelltext
-Source: "Nostalgie\*.cfg"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
-Source: "Nostalgie\*.dof"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
-Source: "Nostalgie\*.dpr"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
-Source: "Nostalgie\*.res"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
-Source: "Nostalgie\*.ico"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
-Source: "Nostalgie\*.bas"; Flags: ignoreversion; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
+Source: "Nostalgie\Source\*"; Flags: ignoreversion recursesubdirs; DestDir: "{app}\Quelltexte\Aysalia DOS"; Components: aydos_src
 ; Setup Source
 Source: "Setup.iss"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 Source: "Wizard Image.bmp"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
@@ -94,7 +85,7 @@ Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{tmp}"; Flags: i
 Filename: "{tmp}\Visual Basic 6.0 - Runtime Library SP6.exe"; StatusMsg: "Installiere Microsoft Visual Basic 6.0 Runtime Library..."; Flags: waituntilterminated; Components: vbrt
 
 [Icons]
-Name: "{group}\Aysalia DOS"; Filename: "{app}\Nostalgie\AyDos.exe"; WorkingDir: "{app}\Nostalgie"; Components: aydos
+Name: "{group}\Aysalia DOS"; Filename: "{app}\AyDos.exe"; WorkingDir: "{app}"; Components: aydos
 Name: "{group}\Aysalia - Zeitalter der Dämonen"; Filename: "{app}\Zeitalter der Dämonen.exe"; WorkingDir: "{app}\Zeitalter der Dämonen"; Components: zdd
 Name: "{group}\Aysalia Quelltexte"; Filename: "{app}\Quelltexte"; WorkingDir: "{app}\Zeitalter der Dämonen"; Components: zdd_src sua_src aydos_src iss
 Name: "{group}\Aysalia - Schatten über Aysalia"; Filename: "{app}\Schatten über Aysalia.exe"; WorkingDir: "{app}\Schatten über Aysalia"; Components: sua
