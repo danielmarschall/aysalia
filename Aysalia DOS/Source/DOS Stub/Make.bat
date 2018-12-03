@@ -1,7 +1,11 @@
 
-tasm DOSSTUB.ASM
+c:
 
-tlink /t DOSSTUB.OBJ
+cd \
+
+c:\tasm\bin\tasm DOSSTUB.ASM
+
+c:\tasm\bin\tlink /t DOSSTUB.OBJ
 
 del DOSSTUB.MAP
 

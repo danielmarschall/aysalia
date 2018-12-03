@@ -1,11 +1,14 @@
 
 ; Aysalia DOS Launcher
 ; Launches aydos1.gam and aydos2.gam
-; Revision 2018-12-01
+; Revision 2018-12-03
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model small
 .stack 10h
+
+; -------------------------------------------------------
+
 .data
 
     exename1  db "AYDOS1.GAM",0
@@ -45,6 +48,8 @@
     gameover2 db 'Spiel zu Ende!',13,10,'$'
     gameover3 db '',13,10,'$'
 
+; -------------------------------------------------------
+
 .code
 
 clear_vga PROC
@@ -57,6 +62,13 @@ clear_vga PROC
     ret
 clear_vga ENDP
 
+set_screen12 PROC
+    mov     ah, 0         ; set screen mode
+    mov     al, 12h       ; graphic mode, 640x480 pixel, 16 colors (VGA)
+    int     10h
+    ret
+set_screen12 ENDP
+
 setup_paramblk PROC
     mov     ax, cs
     mov     [paramblk +  4], ax   ; cmdargs_seg
@@ -65,30 +77,41 @@ setup_paramblk PROC
     ret
 setup_paramblk ENDP
 
-start:
-    mov     ax, @data                    ; moving base address of data to ax
-    mov     ds, ax                       ; moving contents of ax into ds
-                                         ; data section now gets initialized                                        
+set_numlock_on PROC
+    push    ds
+    mov     ax, 40h
+    mov     ds, ax        ; go to BIOS Data Area ( http://stanislavs.org/helppc/bios_data_area.html )
+    mov     bx, 17h       ; Load Keyboard flag byte 0
+    mov     al, [bx]      ; read
+    or      al, 20h       ; set bit 5 (numlock) to 1
+    mov     [bx], al      ; write
+    pop     ds
+    ret
+set_numlock_on ENDP
 
-    ; Reduce size of own application to give the called applications more space
-    mov     ah, 4ah
-    mov     al, 00h    
-    mov     bx, 100       ; 100 paragraphs a 16 byte = 1600 byte
-                          ; EXE size is 1140 byte
-    int     21h
-
-menu:
-    ; Video Mode VGA 12
-    mov     ah, 0
-    mov     al, 12h 
-    int     10h
-
-    ; Flush keyboard buffer    
-    mov     ah, 0ch
+flush_keyb_buf PROC
+    mov     ah, 0Ch       ; Flush input buffer and input 
     mov     al, 0
-    int     21h    
+    int     21h
+    ret
+flush_keyb_buf ENDP
 
-    ; Print message
+exit_to_dos PROC
+    mov     ah, 4ch
+    mov     al, 00h
+    int     21h
+    ret
+exit_to_dos ENDP
+
+sleep_5 PROC
+    mov     ah, 86h
+    mov     cx, 004bh
+    mov     dx, 4000h
+    int     15h
+    ret
+sleep_5 ENDP
+
+print_menu_screen PROC
     mov     ah, 9
     lea     dx, menu1
     int     21h
@@ -126,17 +149,69 @@ menu:
     int     21h
     lea     dx, menu18
     int     21h
+    ret
+print_menu_screen ENDP
+
+print_gameover_screen PROC
+    mov     ah, 9
+    lea     dx, gameover1
+    int     21h
+    lea     dx, gameover2
+    int     21h
+    lea     dx, gameover3
+    int     21h
+    ret
+print_gameover_screen ENDP
+
+; -------------------------------------------------------
+
+start:
+    ; Setup data segment
+    mov     ax, @data     ; moving base address of data to ax
+    mov     ds, ax        ; moving contents of ax into ds
+                          ; data section now gets initialized                                        
+
+    ; Preserve the original screen mode
+    mov     ah, 0Fh       ; Query screen mode
+    int     10h
+    push    ax            ; actually, we are only interested in register al (screen mode), not in ah (column count)
+    
+    ; Change numlock to ON
+    ; DOSBox has a bug where the NumLock is not correctly set to the setting of the host system,
+    ; so you have to press the NumLock key twice so that DOSBox recognizes the status.
+    ; see: https://sourceforge.net/p/dosbox/bugs/71/
+    ;      https://superuser.com/questions/255102/is-there-a-way-to-use-the-numeric-keypad-in-dosbox/1146986
+    ; Since the game uses number keys very often, we set NumLock to ON
+    call    set_numlock_on
+
+    ; Reduce size of own application to give the called applications more space
+    ; see https://stackoverflow.com/a/10067627
+    mov     ah, 4Ah
+    mov     al, 00h    
+    mov     bx, 100       ; 100 paragraphs a 16 byte = 1600 byte
+                          ; EXE size is 1188 byte
+    int     21h
+
+menu:
+    ; Video Mode VGA 12
+    call    set_screen12
+
+    ; Flush keyboard buffer    
+    call    flush_keyb_buf
+
+    ; Print menu screen
+    call    print_menu_screen
     
 retry:
     ; Query keyboard input
-    mov     ah, 07h   ; Direct character input, without echo
+    mov     ah, 07h       ; Direct character input, without echo
     int     21h
     cmp     al, '1'
     je      prog1
     cmp     al, '2'
     je      prog2
     cmp     al, '9'
-    je      ende
+    je      exit
 
     ; Invalid input
     jmp     retry
@@ -149,13 +224,13 @@ prog1:
     call    setup_paramblk
 
     ; Start game 1
-    mov     ah, 4bh   ; execute 
-    mov     al, 00h   ; load and execute 
+    mov     ah, 4Bh       ; execute 
+    mov     al, 00h       ; load and execute 
     mov     bx, paramblk
     lea     dx, exename1
     int     21h
     
-    ; Notify the player that the game is finished
+    ; Notify the player that the game has finished
     jmp     gameover
 
 prog2:
@@ -166,43 +241,34 @@ prog2:
     call    setup_paramblk
 
     ; Start game 2
-    mov     ah, 4bh   ; execute 
-    mov     al, 00h   ; load and execute 
+    mov     ah, 4Bh       ; execute 
+    mov     al, 00h       ; load and execute 
     mov     bx, paramblk
     lea     dx, exename2
     int     21h
 
-    ; Notify the player that the game is finished
+    ; Notify the player that the game has finished
     jmp     gameover
-
+    
 gameover:
-    ; Print message
-    mov     ah, 9
-    lea     dx, gameover1
-    int     21h
-    lea     dx, gameover2
-    int     21h
-    lea     dx, gameover3
-    int     21h
+    ; Print gameover screen
+    call    print_gameover_screen
 
-    ; Sleep approx 5 seconds
-    mov     ah, 86h
-    mov     cx, 004bh
-    mov     dx, 4000h
-    int     15h
+    ; Give the player time to read the game over message (approx 5 seconds)
+    call    sleep_5
 
-    ; Go to the menu
+    ; Go back to the menu
     jmp     menu
     
-ende:
+exit:
     ; Reset video mode to DOS default
-    mov     ah, 0
-    mov     al, 3
+    pop     ax            ; the video mode we have preserved at program start
+    mov     ah, 0         ; set screen mode
     int     10h
 
     ; Return to DOS
-    mov     ah, 4ch
-    mov     al, 00h
-    int     21h
+    call    exit_to_dos
+
+; -------------------------------------------------------
 
 end start
