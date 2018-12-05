@@ -1,7 +1,7 @@
 
 ; Aysalia DOS Launcher
 ; Launches aydos1.gam and aydos2.gam
-; Revision 2018-12-03
+; Revision 2018-12-05
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model small
@@ -187,9 +187,7 @@ start:
     ; Reduce size of own application to give the called applications more space
     ; see https://stackoverflow.com/a/10067627
     mov     ah, 4Ah
-    mov     al, 00h    
-    mov     bx, 100       ; 100 paragraphs a 16 byte = 1600 byte
-                          ; EXE size is 1188 byte
+    mov     bx, 100       ; 100 paragraphs a 16 bytes = 1600 bytes
     int     21h
 
 menu:

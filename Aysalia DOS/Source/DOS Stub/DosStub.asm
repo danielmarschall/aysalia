@@ -1,7 +1,7 @@
 
 ; Aysalia DOS Launcher
 ; DOS Stub for AyDos.exe fat binary
-; Revision 2018-12-01
+; Revision 2018-12-05
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model tiny
@@ -28,10 +28,8 @@ jmp real_start
 
 real_start:
     ; Reduce size of own application to give the called applications more space
-    ; TODO: Is that required for a COM file?
     mov     ah, 4ah
-    mov     al, 00h    
-    mov     bx, 50        ; 50 paragraphs a 16 byte = 800 byte
+    mov     bx, 32    ; 32 paragraphs a 16 bytes = 512 bytes
     int     21h
 
     ; Start Menu
