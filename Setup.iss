@@ -18,6 +18,7 @@ SolidCompression=yes
 WizardImageFile=Wizard Image.bmp
 WizardSmallImageFile=Wizard Small Image.bmp
 ;MinVersion=4.0
+UninstallDisplayIcon={app}\UninstallIcon.ico
 
 [Languages]
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"
@@ -64,6 +65,7 @@ Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{app}\Quelltexte
 Source: "Visual C++ 6.0 - Runtime Library.exe"; DestDir: "{app}\Quelltexte\InnoSetup"; Flags: ignoreversion; Components: iss
 ; Allgemein
 Source: "Readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
+Source: "UninstallIcon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; Temporäre Runtime (Runtime wird bei Setup-Source behalten)
 Source: "Visual Basic 6.0 - Runtime Library SP6.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: sua zdd
 Source: "Visual C++ 6.0 - Runtime Library.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: aydos
