@@ -33,9 +33,9 @@ type
 var
   funcGetModuleFileNameEx: TGetModuleFileNameExFunc;
 begin
-  if psAPIHandle <> 0 then
+  if hPsApiDll <> 0 then
   begin
-    @funcGetModuleFileNameEx := GetProcAddress(psAPIHandle, 'GetModuleFileNameExW');
+    @funcGetModuleFileNameEx := GetProcAddress(hPsApiDll, 'GetModuleFileNameExW');
     if Assigned(funcGetModuleFileNameEx) then
       result := funcGetModuleFileNameEx(inProcess, inModule, Filename, size)
     else
@@ -72,6 +72,10 @@ var
 const
   TargetWinWidth = 640;
   TargetWinHeight = 480;
+resourcestring
+  AyDosTitle = 'Aysalia DOS';
+  AyDos1Title = 'Aysalia DOS I';
+  AyDos2Title = 'Aysalia DOS II';
 begin
   ZeroMemory(@Title, sizeof(Title));
   GetWindowText(hWnd, @Title, sizeof(Title)-1);
@@ -89,11 +93,11 @@ begin
 
   // Change window title
   if Pos('AYDOS1', Title) > 0 then
-    SetWindowText(hWnd, 'Aysalia DOS I')
+    SetWindowText(hWnd, PChar(AyDos1Title))
   else if Pos('AYDOS2', Title) > 0 then
-    SetWindowText(hWnd, 'Aysalia DOS II')
+    SetWindowText(hWnd, PChar(AyDos2Title))
   else
-    SetWindowText(hWnd, 'Aysalia DOS');
+    SetWindowText(hWnd, PChar(AyDosTitle));
 
   // Change window and taskbar icon
   if hIcon > 0 then
@@ -151,7 +155,7 @@ begin
 end;
 
 function ShellExecuteWait(hWnd: HWND; Operation, FileName, Parameters,
-  Directory: PAnsiChar; ShowCmd: Integer): DWord;
+  Directory: PChar; ShowCmd: Integer): DWord;
 var
   Info: TShellExecuteInfo;
   pInfo: PShellExecuteInfo;
@@ -184,10 +188,10 @@ begin
   ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
     PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
 
-  sFile := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
+  sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
   if FileExists(sFile) then DeleteFile(PChar(sFile));
 
-  sFile := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
+  sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
   if FileExists(sFile) then DeleteFile(PChar(sFile));
 
   result := 0;
