@@ -1,7 +1,7 @@
 
 ; Aysalia DOS Launcher
 ; Launches aydos1.gam and aydos2.gam
-; Revision 2018-12-05
+; Revision 2018-12-06
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model small
@@ -43,6 +43,10 @@
     menu16    db '', 13, 10, '$'
     menu17    db '', 13, 10, '$'
     menu18    db '', 13, 10, '$'	
+    
+    error1    db '',13,10,'$'
+    error2    db 'Fehler: Spiel kann nicht gestartet werden. Fehlt eine Datei?',13,10,'$'
+    error3    db '',13,10,'$'
 
     gameover1 db '',13,10,'$'
     gameover2 db 'Spiel zu Ende!',13,10,'$'
@@ -104,10 +108,14 @@ exit_to_dos PROC
 exit_to_dos ENDP
 
 sleep_5 PROC
-    mov     ah, 86h
-    mov     cx, 004bh
-    mov     dx, 4000h
-    int     15h
+    mov     ah, 0         ; function no. for read
+    int     1Ah           ; get the time of day count
+    add     dx, 65        ; dx=9 is 0.5 sec
+    mov     bx, dx        ; store end of delay value in bx
+again:
+    int     1Ah
+    cmp     dx, bx
+    jne     again
     ret
 sleep_5 ENDP
 
@@ -151,6 +159,17 @@ print_menu_screen PROC
     int     21h
     ret
 print_menu_screen ENDP
+
+print_error_screen PROC
+    mov     ah, 9
+    lea     dx, error1
+    int     21h
+    lea     dx, error2
+    int     21h
+    lea     dx, error3
+    int     21h
+    ret
+print_error_screen ENDP
 
 print_gameover_screen PROC
     mov     ah, 9
@@ -228,6 +247,9 @@ prog1:
     lea     dx, exename1
     int     21h
     
+    ; Is everything OK? Or is the GAM file missing?
+    jc      error
+
     ; Notify the player that the game has finished
     jmp     gameover
 
@@ -244,9 +266,28 @@ prog2:
     mov     bx, paramblk
     lea     dx, exename2
     int     21h
+    
+    ; Is everything OK? Or is the GAM file missing?
+    jc      error
 
     ; Notify the player that the game has finished
     jmp     gameover
+    
+error:
+    ; Video Mode VGA 12
+    call    set_screen12
+
+    ; Clear screen
+    ; call    clear_vga
+    
+    ; Print error
+    call    print_error_screen
+    
+    ; Give the player time to read the error message (approx 5 seconds)
+    call    sleep_5
+
+    ; Go back to the menu
+    jmp     menu
     
 gameover:
     ; Print gameover screen
