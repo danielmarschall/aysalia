@@ -27,39 +27,38 @@ function GetModuleFileNameEx(inProcess: THandle; inModule: THandle;
       external 'psapi.dll' name 'GetModuleFileNameExA';
 *)
 {$IFDEF UNICODE}
-function GetModuleFileNameEx(inProcess: THandle; inModule: THandle; Filename: PWideChar; size: DWord): DWord;
+function GetModuleFileNameEx(inProcess: THandle; inModule: THandle; Filename: PWideChar; size: DWord): Integer;
 type
   TGetModuleFileNameExFunc = function (inProcess: THandle; inModule: THandle; Filename: PWideChar; size: DWord): DWord; stdcall;
 var
-  dllHandle: Cardinal;
   funcGetModuleFileNameEx: TGetModuleFileNameExFunc;
 begin
   if psAPIHandle <> 0 then
   begin
-    @funcGetModuleFileNameEx := GetProcAddress(psAPIHandle, 'GetModuleFileNameExW') ;
-    if Assigned (funcGetModuleFileNameEx) then
+    @funcGetModuleFileNameEx := GetProcAddress(psAPIHandle, 'GetModuleFileNameExW');
+    if Assigned(funcGetModuleFileNameEx) then
       result := funcGetModuleFileNameEx(inProcess, inModule, Filename, size)
     else
-      result := 0;
+      result := -1;
   end
-  else result := 0;
+  else result := -2;
 end;
 {$ELSE}
-function GetModuleFileNameEx(inProcess: THandle; inModule: THandle; Filename: PAnsiChar; size: DWord): DWord;
+function GetModuleFileNameEx(inProcess: THandle; inModule: THandle; Filename: PAnsiChar; size: DWord): Integer;
 type
   TGetModuleFileNameExFunc = function (inProcess: THandle; inModule: THandle; Filename: PAnsiChar; size: DWord): DWord; stdcall;
 var
-  funcGetModuleFileNameEx : TGetModuleFileNameExFunc;
+  funcGetModuleFileNameEx: TGetModuleFileNameExFunc;
 begin
   if hPsApiDll <> 0 then
   begin
-    @funcGetModuleFileNameEx := GetProcAddress(hPsApiDll, 'GetModuleFileNameExA') ;
-    if Assigned (funcGetModuleFileNameEx) then
+    @funcGetModuleFileNameEx := GetProcAddress(hPsApiDll, 'GetModuleFileNameExA');
+    if Assigned(funcGetModuleFileNameEx) then
       result := funcGetModuleFileNameEx(inProcess, inModule, Filename, size)
     else
-      result := 0;
+      result := -1;
   end
-  else result := 0;
+  else result := -2;
 end;
 {$ENDIF}
 
@@ -112,30 +111,28 @@ end;
 function EnumWindowsProc(Handle: hWnd; dummy: DWORD): BOOL; stdcall;
 var
   Title: array[0..255] of Char;
-const
-  C_FileNameLength = 256;
+  WinFileName: array[0..MAX_PATH] of Char;
 var
-  WinFileName: string;
-  PID, hProcess: DWORD;
-  Len: Byte;
+  PID: DWORD;
+  hProcess: THandle;
+  Len: Integer;
 begin
   Result := True;
-  SetLength(WinFileName, C_FileNameLength);
-  GetWindowThreadProcessId(Handle, PID);
+  ZeroMemory(@WinFileName, sizeof(WinFileName));
+  GetWindowThreadProcessId(Handle, @PID);
   hProcess := OpenProcess(PROCESS_ALL_ACCESS, False, PID);
-  Len := GetModuleFileNameEx(hProcess, 0, PChar(WinFileName), C_FileNameLength);
+  Len := GetModuleFileNameEx(hProcess, 0, WinFileName, sizeof(WinFileName)-1);
   if Len > 0 then
   begin
     // GetModuleFileNameEx is available on newer operating systems;
     // it ensures that we find the correct window by checking its EXE filename.
-    SetLength(WinFileName, Len);
     if SameText(WinFileName, ExtractFilePath(ParamStr(0)) + DOSBOX_EXE) then
     begin
       Result := False; // stop enumeration
       ChangeTitleAndIcon(Handle);
     end;
   end
-  else
+  else if Len < 0 then
   begin
     // At Win9x, there is no psapi.dll, so we try it the old fashioned way,
     // finding the window by parts of its title
@@ -158,7 +155,6 @@ function ShellExecuteWait(hWnd: HWND; Operation, FileName, Parameters,
 var
   Info: TShellExecuteInfo;
   pInfo: PShellExecuteInfo;
-  exitCode: DWord;
 begin
   pInfo := @Info;
   with Info do
@@ -167,7 +163,7 @@ begin
     fMask        := SEE_MASK_NOCLOSEPROCESS;
     wnd          := hWnd;
     lpVerb       := Operation;
-    lpFile       := FileName;;
+    lpFile       := FileName;
     lpParameters := PChar(Parameters + #0);
     lpDirectory  := PChar(Directory);
     nShow        := ShowCmd;
@@ -176,11 +172,9 @@ begin
   ShellExecuteEx(pInfo);
 
   repeat
-    exitCode := WaitForSingleObject(Info.hProcess, 10);
+    result := WaitForSingleObject(Info.hProcess, 10);
     EnumWindows(@EnumWindowsProc, 0);
-  until (exitCode <> WAIT_TIMEOUT);
-
-  result := exitCode;
+  until (result <> WAIT_TIMEOUT);
 end;
 
 function Main: Integer;
@@ -190,18 +184,21 @@ begin
   ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
     PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
 
-  sFile := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
+  sFile := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
   if FileExists(sFile) then DeleteFile(PChar(sFile));
 
-  sFile := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
+  sFile := IncludeTrailingBackSlash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
   if FileExists(sFile) then DeleteFile(PChar(sFile));
 
   result := 0;
 end;
 
 begin
-  hPsApiDll := LoadLibrary('psapi.dll') ;
-  hIcon := LoadIcon(hInstance, 'MainIcon');
-  ExitCode := Main;
-  FreeLibrary(hPsApiDll);
+  hPsApiDll := LoadLibrary('psapi.dll');
+  try
+    hIcon := LoadIcon(hInstance, 'MainIcon');
+    ExitCode := Main;
+  finally
+    FreeLibrary(hPsApiDll);
+  end;
 end.
