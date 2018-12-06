@@ -29,6 +29,7 @@ AyDos.exe is a "fat binary" which can be called by DOS and Windows.
 
 In Windows mode, it calls DOSBox.exe with the arguments "-noconsole -conf DOSBox.conf" and
 the working directory being the directory where the EXE file is located.
+It also centers the DOSBox window and changes its window title and icon at runtime.
 
 In DOS mode, it executes the application "AYDOS.MNU" (which is actually a COM-file
 containing the menu code that will eventually call AYDOS1.GAM or AYDOS2.GAM which are
