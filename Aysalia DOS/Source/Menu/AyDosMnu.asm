@@ -108,18 +108,36 @@ exit_to_dos PROC
 exit_to_dos ENDP
 
 sleep_5 PROC
-    mov     ah, 0         ; function no. for read
-    int     1Ah           ; get the time of day count
-    add     dx, 65        ; dx=9 is 0.5 sec
-    mov     bx, dx        ; store end of delay value in bx
-again:
+    mov     ah, 00h
+    int     1Ah
+    cmp     dx, 7FFFh
+    jg      upperhalf
+lowerhalf:
+    mov     bx, dx
+    add     bx, 91   ; 18.2 = 1 sec (therefore 91 = 5 sec)
+lowerhalf_again:
     int     1Ah
     cmp     dx, bx
-    jne     again
+    jl      lowerhalf_again
+    ret
+upperhalf:
+    mov     bx, dx
+    sub     bx, 7FFFh
+    add     bx, 91   ; 18.2 = 1 sec (therefore 91 = 5 sec)
+upperhalf_again:
+    int     1Ah
+    sub     dx, 7FFFh
+    cmp     dx, bx
+    jl      upperhalf_again
     ret
 sleep_5 ENDP
 
 print_menu_screen PROC
+    mov     ah, 0Bh
+    mov     bh, 00h
+    mov     bl, 8     ; green
+    int     10h
+
     mov     ah, 9
     lea     dx, menu1
     int     21h
@@ -161,6 +179,11 @@ print_menu_screen PROC
 print_menu_screen ENDP
 
 print_error_screen PROC
+    mov     ah, 0Bh
+    mov     bh, 00h
+    mov     bl, 4     ; red
+    int     10h
+
     mov     ah, 9
     lea     dx, error1
     int     21h
@@ -172,6 +195,11 @@ print_error_screen PROC
 print_error_screen ENDP
 
 print_gameover_screen PROC
+    mov     ah, 0Bh
+    mov     bh, 00h
+    mov     bl, 4     ; red
+    int     10h
+
     mov     ah, 9
     lea     dx, gameover1
     int     21h
