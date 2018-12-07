@@ -161,12 +161,8 @@ set_bg_color PROC
 set_bg_color ENDP
 
 print_menu_screen PROC
-    ; Move cursor to 0, 0
-    mov     ah, 02h       ; set cursor position
-    mov     dh, 0         ; line
-    mov     dl, 0         ; column
-    mov     bh, 0         ; page
-    int     10h
+    ; Clear screen
+    call    clear_vga
 
     ; Set background color
     mov     bl, 8         ; dark green background
@@ -181,12 +177,8 @@ print_menu_screen PROC
 print_menu_screen ENDP
 
 print_error_screen PROC
-    ; Move cursor to 0, 0
-    mov     ah, 02h       ; set cursor position
-    mov     dh, 0         ; line
-    mov     dl, 0         ; column
-    mov     bh, 0         ; page
-    int     10h
+    ; Clear screen
+    call    clear_vga
 
     ; Set background color
     mov     bl, 4         ; dark red background
@@ -200,7 +192,7 @@ print_error_screen PROC
     ret
 print_error_screen ENDP
 
-print_gameover_screen PROC
+print_gameover_message PROC
     ; Keep cursor position
 
     ; Set background color
@@ -213,7 +205,7 @@ print_gameover_screen PROC
     call    print_color_string
     
     ret
-print_gameover_screen ENDP
+print_gameover_message ENDP
 
 ; -------------------------------------------------------
 
@@ -310,9 +302,6 @@ error:
     ; Video Mode VGA 12
     call    set_screen12
 
-    ; Clear screen
-    ; call    clear_vga
-    
     ; Print error
     call    print_error_screen
     
@@ -323,8 +312,8 @@ error:
     jmp     menu
     
 gameover:
-    ; Print gameover screen
-    call    print_gameover_screen
+    ; Print gameover message
+    call    print_gameover_message
 
     ; Give the player time to read the game over message (approx 5 seconds)
     call    sleep_5
