@@ -138,14 +138,13 @@ print_color_string PROC
     ; cl = Color
     mov     ah, 0Eh
 print_color_string_again:
-    mov     al, 0
     mov     bx, dx
-    cmp     [bx], al
-    je      print_color_string_end
     mov     al, [bx]
+    cmp     al, 0         ; is the character zero? then we are done
+    je      print_color_string_end
     mov     bl, cl
     int     10h
-    add     dx, 1
+    add     dx, 1         ; go to next character
     jmp     print_color_string_again
 print_color_string_end:
     ret
