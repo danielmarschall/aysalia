@@ -8,12 +8,6 @@ program AyDos;
 // centers the window and changes the window title and icon at runtime.
 
 uses
-
-
-
-dialogs,
-
-
   SysUtils,
   ShellAPI,
   Windows,
