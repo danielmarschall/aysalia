@@ -5,7 +5,7 @@ Annotations for the Aysalia DOS I & II source codes
 CALLING FLOW
 ------------
 
-When running under Windows:
+When running under Windows that supports DOXBox:
 
 	AyDos.exe (32 Bit PE) --> DOSBox (32 Bit PE) --> AyDos.exe (16 Bit COM) --> AyDos.mnu (16 Bit MZ) --> AyDos1/2.gam (16 Bit MZ)
 
@@ -13,6 +13,13 @@ When running under Windows:
 	2. DOSBox.conf starts AyDos.exe (16 Bit MZ) as autostart
 	3. AyDos.exe (16 Bit COM) calls AyDos.mnu (16 Bit MZ)
 	4. AyDos.mnu (16 Bit MZ) shows a menu and calls AyDos1.gam or AyDos2.gam (both 16 Bit MZ)
+	
+When running under Windows that does not support DOSBox (only Windows 95):
+
+	AyDos.exe (32 Bit PE) --> AyDos.mnu (16 Bit MZ) --> AyDos1/2.gam (16 Bit MZ)
+
+	1. AyDos.exe (32 Bit PE) calls AyDos.mnu (16 Bit MZ) by temporarily renaming it to AyDos.com
+	2. AyDos.mnu (16 Bit MZ) shows a menu and calls AyDos1.gam or AyDos2.gam (both 16 Bit MZ)
 	
 When running under DOS:
 
