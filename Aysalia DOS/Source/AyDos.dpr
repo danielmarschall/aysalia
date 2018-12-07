@@ -72,8 +72,8 @@ const
   TargetWinHeight = 480;
 resourcestring
   AyDosTitle = 'Aysalia DOS';
-  AyDos1Title = 'Aysalia DOS I';
-  AyDos2Title = 'Aysalia DOS II';
+  AyDos1Title = 'Aysalia DOS 1';
+  AyDos2Title = 'Aysalia DOS 2';
 begin
   ZeroMemory(@Title, sizeof(Title));
   GetWindowText(hWnd, @Title, sizeof(Title)-1);
@@ -94,7 +94,7 @@ begin
     SetWindowText(hWnd, PChar(AyDos1Title))
   else if Pos('AYDOS2', Title) > 0 then
     SetWindowText(hWnd, PChar(AyDos2Title))
-  else
+  else if Pos('AYDOS', Title) > 0 then
     SetWindowText(hWnd, PChar(AyDosTitle));
 
   // Change window and taskbar icon
