@@ -8,6 +8,12 @@ program AyDos;
 // centers the window and changes the window title and icon at runtime.
 
 uses
+
+
+
+dialogs,
+
+
   SysUtils,
   ShellAPI,
   Windows,
@@ -17,6 +23,7 @@ uses
 
 const
   DOSBOX_EXE = 'DOSBox.exe';
+  AYDOS_MNU = 'AyDos.mnu';
 
 var
   hPsApiDll: Cardinal = 0;
@@ -179,18 +186,72 @@ begin
   until (result <> WAIT_TIMEOUT);
 end;
 
+function CanRunDosBox: boolean;
+var
+  windir: array[0..MAX_PATH] of char;
+  osVerInfo: TOSVersionInfo;
+begin
+  osVerInfo.dwOSVersionInfoSize := SizeOf(TOSVersionInfo);
+  if GetVersionEx(osVerInfo) then
+  begin
+    // DOSBox does not work with Windows 95
+    // It works on Windows 98 (but the VC++ Runtime must be installed)
+    if osVerInfo.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS then
+    begin
+      result := (osVerInfo.dwMajorVersion > 4) or
+               ((osVerInfo.dwMajorVersion = 4) and (osVerInfo.dwMinorVersion >= 10{Win98}));
+    end
+    else if osVerInfo.dwPlatformId = VER_PLATFORM_WIN32_NT then
+    begin
+      result := true;
+    end
+    else
+    begin
+      // This should not happen
+      result := false;
+    end;
+  end
+  else
+  begin
+    if GetWindowsDirectory(windir, sizeof(windir)) > 0 then
+    begin
+      // In case GetVersionEx fails, we are trying to see if command.com exists
+      result := FileExists(windir + '\command.com');
+    end
+    else
+    begin
+      // This should never happen
+      result := false;
+    end;
+  end;
+end;
+
 function Main: Integer;
 var
   sFile: string;
 begin
-  ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
-    PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+  if CanRunDosBox then
+  begin
+    ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
+      PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
 
-  sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
-  if FileExists(sFile) then DeleteFile(PChar(sFile));
+    sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
+    if FileExists(sFile) then DeleteFile(PChar(sFile));
 
-  sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
-  if FileExists(sFile) then DeleteFile(PChar(sFile));
+    sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
+    if FileExists(sFile) then DeleteFile(PChar(sFile));
+  end
+  else
+  begin
+    // SEE_MASK_CLASSNAME cannot be used with pure MZ files (it does only work for NE/PE files!)
+    // So we need to do the dirty rename-hack...
+    RenameFile('AyDos.mnu', 'AyDos.com');
+    try
+      ShellExecuteWait(0, 'open', 'AyDos.com', '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+    finally
+      RenameFile('AyDos.com', 'AyDos.mnu');
+    end;
+  end;
 
   result := 0;
 end;

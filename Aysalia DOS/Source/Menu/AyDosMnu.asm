@@ -5,7 +5,7 @@
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model small
-.stack 10h
+.stack 100h
 
 ; -------------------------------------------------------
 
@@ -82,6 +82,23 @@ setup_paramblk PROC
 setup_paramblk ENDP
 
 set_numlock_on PROC
+    push es
+
+    ; In Windows 98+, we cannot access the BIOS Data Area,
+    ; so we use this technique to check if we are inside Windows.
+    ; This code was taken from http://www.fysnet.net/chkwin.htm
+    xor     ax,ax         ; point es:di to 0000:0000h
+    mov     es,ax         ;  
+    mov     di,ax         ;
+    mov     ax,1602h      ; Get API entry point
+    int     2Fh           ;   call to multiplex interrupt
+    mov     ax,es         ;
+    or      ax,ax         ; if es:di doesn't point to 0000:0000h
+    jnz     short is_win  ;   then Windows is running a DOS box
+    or      di,di         ; else
+    jnz     short is_win  ;   we are in True DOS
+
+    ; Now the actual code that sets numlock on
     push    ds
     mov     ax, 40h
     mov     ds, ax        ; Go to BIOS Data Area ( http://stanislavs.org/helppc/bios_data_area.html )
@@ -90,6 +107,9 @@ set_numlock_on PROC
     or      al, 20h       ; Set bit 5 (numlock) to 1
     mov     [bx], al      ; Write
     pop     ds
+    
+is_win:
+    pop es
     ret
 set_numlock_on ENDP
 
@@ -140,8 +160,8 @@ print_color_string PROC
 print_color_string_again:
     mov     bx, dx
     mov     al, [bx]
-    cmp     al, 0         ; is the character zero? then we are done
-    je      print_color_string_end
+    test    al, al        ; is the character zero? then we are done
+    jz      print_color_string_end
     mov     bl, cl
     int     10h
     add     dx, 1         ; go to next character
@@ -195,11 +215,11 @@ print_gameover_message PROC
     ; Keep cursor position
 
     ; Set background color
-    mov     bl, 4    ; dark red background
+    mov     bl, 4         ; dark red background
     call    set_bg_color
     
     ; Set text color
-    mov     cl, 0Fh  ; white font
+    mov     cl, 0Fh       ; white font
     lea     dx, gameover1
     call    print_color_string
     
@@ -265,11 +285,15 @@ prog1:
     call    setup_paramblk
 
     ; Start game 1
-    mov     ah, 4Bh       ; execute 
-    mov     al, 00h       ; load and execute 
-    mov     bx, paramblk
+    mov     ax, @data     ; ds:dx = ASCIZ program name (must include extension)
+    mov     ds, ax
     lea     dx, exename1
-    int     21h
+    mov     ax, @data     ; es:bx = Parameter block
+    mov     es, ax
+    mov     bx, paramblk
+    mov     ah, 4Bh       ; execute
+    mov     al, 00h       ; load and execute
+    int     21h           ; DOS API
     
     ; Is everything OK? Or is the GAM file missing?
     jc      error
@@ -285,11 +309,15 @@ prog2:
     call    setup_paramblk
 
     ; Start game 2
-    mov     ah, 4Bh       ; execute 
-    mov     al, 00h       ; load and execute 
-    mov     bx, paramblk
+    mov     ax, @data     ; ds:dx = ASCIZ program name (must include extension)
+    mov     ds, ax
     lea     dx, exename2
-    int     21h
+    mov     ax, @data     ; es:bx = Parameter block
+    mov     es, ax
+    mov     bx, paramblk
+    mov     ah, 4Bh       ; execute
+    mov     al, 00h       ; load and execute
+    int     21h           ; DOS API
     
     ; Is everything OK? Or is the GAM file missing?
     jc      error
