@@ -1,7 +1,7 @@
 program AyDos;
 
 // Aysalia DOS Launcher
-// Revision 2018-12-06
+// Revision 2018-12-07
 // (C) 2018 Daniel Marschall, ViaThinkSoft
 
 // This launcher does launch DOSBox with the correct *.conf file,
@@ -19,7 +19,9 @@ const
   DOSBOX_EXE = 'DOSBox.exe';
 
 var
-  hPsApiDll: cardinal;
+  hPsApiDll: Cardinal = 0;
+  hIcon: THandle = 0;
+  bCeneredOnce: boolean = false;
 
 (*
 function GetModuleFileNameEx(inProcess: THandle; inModule: THandle;
@@ -61,10 +63,6 @@ begin
   else result := -2;
 end;
 {$ENDIF}
-
-var
-  hIcon: THandle = 0;
-  bCeneredOnce: boolean = false;
 
 procedure ChangeTitleAndIcon(hWnd: Thandle);
 var
@@ -204,5 +202,6 @@ begin
     ExitCode := Main;
   finally
     FreeLibrary(hPsApiDll);
+    hPsApiDll := 0;
   end;
 end.
