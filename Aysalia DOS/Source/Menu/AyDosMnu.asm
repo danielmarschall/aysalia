@@ -1,7 +1,7 @@
 
 ; Aysalia DOS Launcher
 ; Launches aydos1.gam and aydos2.gam
-; Revision 2018-12-06
+; Revision 2018-12-07
 ; (C) 2018 Daniel Marschall, ViaThinkSoft
 
 .model small
@@ -11,9 +11,9 @@
 
 .data
 
-    exename1  db "AYDOS1.GAM",0
-    exename2  db "AYDOS2.GAM",0
-    cmdargs   db 0,'',0dh
+    exename1  db "AYDOS1.GAM", 0
+    exename2  db "AYDOS2.GAM", 0
+    cmdargs   db 0, '', 0Dh
 
     dummy_fcb db 36 dup(0)
 
@@ -25,39 +25,39 @@
               dw dummy_fcb  ; fcb2
               dw 0          ; fcb2_seg
 
-    menu1     db '', 13, 10, '$'
-    menu2     db '', 13, 10, '$'
-    menu3     db '', 13, 10, '$'
-    menu4     db '', 13, 10, '$'
-    menu5     db '                            Aysalia DOS',13,10,'$'
-    menu6     db '', 13, 10, '$'
-    menu7     db '', 13, 10, '$'
-    menu8     db '              Welches Spiel soll gestartet werden?',13,10,'$'
-    menu9     db '', 13, 10, '$'
-    menu10    db '              Dr',81h,'cke eine der folgenden Tasten:',13,10,'$'
-    menu11    db '', 13, 10, '$'
-    menu12    db '              1  Aysalia DOS I',13,10,'$'
-    menu13    db '              2  Aysalia DOS II',13,10,'$'
-    menu14    db '', 13, 10, '$'
-    menu15    db '              9  Beenden',13,10,'$'
-    menu16    db '', 13, 10, '$'
-    menu17    db '', 13, 10, '$'
-    menu18    db '', 13, 10, '$'	
+    menu1     db 13, 10, \
+                 13, 10, \
+                 13, 10, \
+                 13, 10, \
+                 '                            Aysalia DOS', 13, 10, \
+                 13, 10, \
+                 13, 10, \
+                 '              Welches Spiel soll gestartet werden?', 13, 10, \
+                 13, 10, \
+                 '              Dr', 81h, 'cke eine der folgenden Tasten:', 13, 10, \
+                 13, 10, \
+                 '              1  Aysalia DOS I', 13, 10, \
+                 '              2  Aysalia DOS II', 13, 10, \
+                 13, 10, \
+                 '              9  Beenden', 13, 10, \
+                 13, 10, \
+                 13, 10, \
+                 13, 10, 0
     
-    error1    db '',13,10,'$'
-    error2    db 'Fehler: Spiel kann nicht gestartet werden. Fehlt eine Datei?',13,10,'$'
-    error3    db '',13,10,'$'
+    error1    db 13, 10, \
+                 'Fehler: Spiel kann nicht gestartet werden. Fehlt eine Datei?', 13, 10, \
+                 13, 10, 0
 
-    gameover1 db '',13,10,'$'
-    gameover2 db 'Spiel zu Ende!',13,10,'$'
-    gameover3 db '',13,10,'$'
+    gameover1 db 13, 10, \
+                 'Spiel zu Ende!', 13, 10, \
+                 13, 10, 0
 
 ; -------------------------------------------------------
 
 .code
 
 clear_vga PROC
-    mov     ax, 0a000h
+    mov     ax, 0A000h
     mov     es, ax
     xor     di, di
     mov     ax, 0
@@ -84,11 +84,11 @@ setup_paramblk ENDP
 set_numlock_on PROC
     push    ds
     mov     ax, 40h
-    mov     ds, ax        ; go to BIOS Data Area ( http://stanislavs.org/helppc/bios_data_area.html )
+    mov     ds, ax        ; Go to BIOS Data Area ( http://stanislavs.org/helppc/bios_data_area.html )
     mov     bx, 17h       ; Load Keyboard flag byte 0
-    mov     al, [bx]      ; read
-    or      al, 20h       ; set bit 5 (numlock) to 1
-    mov     [bx], al      ; write
+    mov     al, [bx]      ; Read
+    or      al, 20h       ; Set bit 5 (numlock) to 1
+    mov     [bx], al      ; Write
     pop     ds
     ret
 set_numlock_on ENDP
@@ -101,7 +101,7 @@ flush_keyb_buf PROC
 flush_keyb_buf ENDP
 
 exit_to_dos PROC
-    mov     ah, 4ch
+    mov     ah, 4Ch
     mov     al, 00h
     int     21h
     ret
@@ -111,102 +111,107 @@ sleep_5 PROC
     mov     ah, 00h
     int     1Ah
     cmp     dx, 7FFFh
-    jg      upperhalf
-lowerhalf:
+    jg      sleep_5_upperhalf
+sleep_5_lowerhalf:
     mov     bx, dx
-    add     bx, 91   ; 18.2 = 1 sec (therefore 91 = 5 sec)
-lowerhalf_again:
+    add     bx, 91        ; 18.2 = 1 sec (therefore 91 = 5 sec)
+sleep_5_lowerhalf_again:
     int     1Ah
     cmp     dx, bx
-    jl      lowerhalf_again
+    jl      sleep_5_lowerhalf_again
     ret
-upperhalf:
+sleep_5_upperhalf:
     mov     bx, dx
     sub     bx, 7FFFh
-    add     bx, 91   ; 18.2 = 1 sec (therefore 91 = 5 sec)
-upperhalf_again:
+    add     bx, 91        ; 18.2 = 1 sec (therefore 91 = 5 sec)
+sleep_5_upperhalf_again:
     int     1Ah
     sub     dx, 7FFFh
     cmp     dx, bx
-    jl      upperhalf_again
+    jl      sleep_5_upperhalf_again
     ret
 sleep_5 ENDP
 
-print_menu_screen PROC
+print_color_string PROC
+    ; This function requires:
+    ; dx = Pointer to zero terminated string
+    ; cl = Color
+    mov     ah, 0Eh
+print_color_string_again:
+    mov     al, 0
+    mov     bx, dx
+    cmp     [bx], al
+    je      print_color_string_end
+    mov     al, [bx]
+    mov     bl, cl
+    int     10h
+    add     dx, 1
+    jmp     print_color_string_again
+print_color_string_end:
+    ret
+print_color_string ENDP
+
+set_bg_color PROC
+    ; This function requires:
+    ; bl = Color
     mov     ah, 0Bh
     mov     bh, 00h
-    mov     bl, 8     ; green
+    int     10h
+    ret
+set_bg_color ENDP
+
+print_menu_screen PROC
+    ; Move cursor to 0, 0
+    mov     ah, 02h       ; set cursor position
+    mov     dh, 0         ; line
+    mov     dl, 0         ; column
+    mov     bh, 0         ; page
     int     10h
 
-    mov     ah, 9
+    ; Set background color
+    mov     bl, 8         ; dark green background
+    call    set_bg_color
+    
+    ; Set text color
+    mov     cl, 0Fh       ; white font
     lea     dx, menu1
-    int     21h
-    lea     dx, menu2
-    int     21h
-    lea     dx, menu3
-    int     21h
-    lea     dx, menu4
-    int     21h
-    lea     dx, menu5
-    int     21h
-    lea     dx, menu6
-    int     21h
-    lea     dx, menu7
-    int     21h
-    lea     dx, menu8
-    int     21h
-    lea     dx, menu9
-    int     21h
-    lea     dx, menu10
-    int     21h
-    lea     dx, menu11
-    int     21h
-    lea     dx, menu12
-    int     21h
-    lea     dx, menu13
-    int     21h
-    lea     dx, menu14
-    int     21h
-    lea     dx, menu15
-    int     21h
-    lea     dx, menu16
-    int     21h
-    lea     dx, menu17
-    int     21h
-    lea     dx, menu18
-    int     21h
+    call    print_color_string
+    
     ret
 print_menu_screen ENDP
 
 print_error_screen PROC
-    mov     ah, 0Bh
-    mov     bh, 00h
-    mov     bl, 4     ; red
+    ; Move cursor to 0, 0
+    mov     ah, 02h       ; set cursor position
+    mov     dh, 0         ; line
+    mov     dl, 0         ; column
+    mov     bh, 0         ; page
     int     10h
 
-    mov     ah, 9
+    ; Set background color
+    mov     bl, 4         ; dark red background
+    call    set_bg_color
+    
+    ; Set text color
+    mov     cl, 0Fh       ; white font
     lea     dx, error1
-    int     21h
-    lea     dx, error2
-    int     21h
-    lea     dx, error3
-    int     21h
+    call    print_color_string
+    
     ret
 print_error_screen ENDP
 
 print_gameover_screen PROC
-    mov     ah, 0Bh
-    mov     bh, 00h
-    mov     bl, 4     ; red
-    int     10h
+    ; Keep cursor position
 
-    mov     ah, 9
+    ; Set background color
+    mov     bl, 4    ; dark red background
+    call    set_bg_color
+    
+    ; Set text color
+    mov     cl, 0Fh  ; white font
     lea     dx, gameover1
-    int     21h
-    lea     dx, gameover2
-    int     21h
-    lea     dx, gameover3
-    int     21h
+    call    print_color_string
+    
     ret
 print_gameover_screen ENDP
 
