@@ -18,6 +18,7 @@ uses
 const
   DOSBOX_EXE = 'DOSBox.exe';
   AYDOS_MNU = 'AyDos.mnu';
+  AYDOS_COM = 'AyDos.com';
 
 var
   hPsApiDll: Cardinal = 0;
@@ -239,11 +240,11 @@ begin
   begin
     // SEE_MASK_CLASSNAME cannot be used with pure MZ files (it does only work for NE/PE files!)
     // So we need to do the dirty rename-hack...
-    RenameFile('AyDos.mnu', 'AyDos.com');
+    RenameFile(AYDOS_MNU, AYDOS_COM);
     try
-      ShellExecuteWait(0, 'open', 'AyDos.com', '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+      ShellExecuteWait(0, 'open', PChar(AYDOS_COM), '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
     finally
-      RenameFile('AyDos.com', 'AyDos.mnu');
+      RenameFile(AYDOS_COM, AYDOS_MNU);
     end;
   end;
 
