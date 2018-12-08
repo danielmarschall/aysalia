@@ -1,7 +1,7 @@
 program AyDos;
 
 // Aysalia DOS Launcher
-// Revision 2018-12-07
+// Revision 2018-12-08
 // (C) 2018 Daniel Marschall, ViaThinkSoft
 
 // This launcher does launch DOSBox with the correct *.conf file,
@@ -155,7 +155,7 @@ begin
 end;
 
 function ShellExecuteWait(hWnd: HWND; Operation, FileName, Parameters,
-  Directory: PChar; ShowCmd: Integer): DWord;
+  Directory: PChar; ShowCmd: Integer; lpEnumFunc: TFNWndEnumProc=nil): DWord;
 var
   Info: TShellExecuteInfo;
   pInfo: PShellExecuteInfo;
@@ -177,7 +177,7 @@ begin
 
   repeat
     result := WaitForSingleObject(Info.hProcess, 10);
-    EnumWindows(@EnumWindowsProc, 0);
+    if Assigned(lpEnumFunc) then EnumWindows(lpEnumFunc, 0);
   until (result <> WAIT_TIMEOUT);
 end;
 
@@ -227,24 +227,34 @@ var
 begin
   if CanRunDosBox then
   begin
-    ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
-      PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+    hPsApiDll := LoadLibrary('psapi.dll');
+    try
+      hIcon := LoadIcon(hInstance, 'MainIcon');
+      bCeneredOnce := false;
 
-    sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
-    if FileExists(sFile) then DeleteFile(PChar(sFile));
+      ShellExecuteWait(0, 'open', DOSBOX_EXE, '-noconsole -conf DOSBox.conf',
+        PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL, @EnumWindowsProc);
 
-    sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
-    if FileExists(sFile) then DeleteFile(PChar(sFile));
+      sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stdout.txt';
+      if FileExists(sFile) then DeleteFile(PChar(sFile));
+
+      sFile := IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + 'stderr.txt';
+      if FileExists(sFile) then DeleteFile(PChar(sFile));
+    finally
+      FreeLibrary(hPsApiDll);
+      hPsApiDll := 0;
+    end;
   end
   else
   begin
     // SEE_MASK_CLASSNAME cannot be used with pure MZ files (it does only work for NE/PE files!)
     // So we need to do the dirty rename-hack...
-    RenameFile(AYDOS_MNU, AYDOS_COM);
+    if FileExists(AYDOS_MNU) and not FileExists(AYDOS_COM) then RenameFile(AYDOS_MNU, AYDOS_COM);
     try
-      ShellExecuteWait(0, 'open', PChar(AYDOS_COM), '', PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL);
+      ShellExecuteWait(0, 'open', PChar(AYDOS_COM), '',
+        PChar(ExtractFilePath(ParamStr(0))), SW_NORMAL, nil);
     finally
-      RenameFile(AYDOS_COM, AYDOS_MNU);
+      if FileExists(AYDOS_COM) and not FileExists(AYDOS_MNU) then RenameFile(AYDOS_COM, AYDOS_MNU);
     end;
   end;
 
@@ -252,12 +262,5 @@ begin
 end;
 
 begin
-  hPsApiDll := LoadLibrary('psapi.dll');
-  try
-    hIcon := LoadIcon(hInstance, 'MainIcon');
-    ExitCode := Main;
-  finally
-    FreeLibrary(hPsApiDll);
-    hPsApiDll := 0;
-  end;
+  ExitCode := Main;
 end.
