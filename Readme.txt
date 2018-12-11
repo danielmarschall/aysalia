@@ -1,6 +1,6 @@
 *************************
 ** AYSALIA: DUAL PACK  **
-** 05. Dezember 2018   **
+** 11. Dezember 2018   **
 *************************
 
 Vielen Dank, dass Sie Aysalia spielen! Das "Dual Pack" beeinhaltet die
