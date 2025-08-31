@@ -57,8 +57,9 @@ AYDOS1.GAM and AYDOS2.GAM
 These games were developed and compiled in QuickBasic, but unfortunately the source code is lost.
 
 The EXE files have been modified with a hex editor to fix some small issues.
-A side effect of one fix is that the video mode is not reset when the game exists.
-Therefore, the EXE files have been renamed to GAM and will be called by the menu/launcher executable,
+A side effect of one fix is that the video mode is not reset when the game exits.
+Therefore, the EXE files have been renamed to GAM to avoid accidentally running it.
+They will be called by the menu/launcher executable,
 which resets the video mode correctly, in addition in showing a menu.
 
 
